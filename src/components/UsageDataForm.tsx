@@ -35,8 +35,23 @@ interface UsageDataFormProps {
 }
 
 const UsageDataForm = ({ open, onOpenChange }: UsageDataFormProps) => {
-  const form = useForm<FormData>({
-    defaultValues: {
+  // Get initial data from localStorage if available
+  const getInitialData = () => {
+    const userData = localStorage.getItem('impactEduUserData');
+    if (userData) {
+      const parsedData = JSON.parse(userData);
+      return {
+        whatsappHours: parsedData.whatsappHours || 2.5,
+        instagramHours: parsedData.instagramHours || 1.0,
+        tiktokHours: parsedData.tiktokHours || 0.5,
+        facebookHours: parsedData.facebookHours || 0.3,
+        twitterHours: parsedData.twitterHours || 0.2,
+        academicUsage: parsedData.academicUsage || 22,
+        gpa: parsedData.gpa || 2.5,
+      };
+    }
+    
+    return {
       whatsappHours: 2.5,
       instagramHours: 1.0,
       tiktokHours: 0.5,
@@ -44,13 +59,28 @@ const UsageDataForm = ({ open, onOpenChange }: UsageDataFormProps) => {
       twitterHours: 0.2,
       academicUsage: 22,
       gpa: 2.5,
-    },
+    };
+  };
+  
+  const form = useForm<FormData>({
+    defaultValues: getInitialData()
   });
 
   const onSubmit = (data: FormData) => {
-    console.log('Form data submitted:', data);
-    // Simulate saving data locally
-    localStorage.setItem('impactEduUserData', JSON.stringify(data));
+    // Add entertainment usage calculation
+    const fullData = {
+      ...data,
+      entertainmentUsage: 100 - data.academicUsage
+    };
+    
+    console.log('Form data submitted:', fullData);
+    
+    // Save data locally
+    localStorage.setItem('impactEduUserData', JSON.stringify(fullData));
+    
+    // Force a refresh of the component to show updated data
+    window.dispatchEvent(new Event('storage'));
+    
     toast.success('Your usage data has been updated!');
     onOpenChange(false);
   };
@@ -73,7 +103,13 @@ const UsageDataForm = ({ open, onOpenChange }: UsageDataFormProps) => {
                     <FormItem>
                       <FormLabel>WhatsApp</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.1" min="0" {...field} />
+                        <Input 
+                          type="number" 
+                          step="0.1" 
+                          min="0" 
+                          {...field} 
+                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -85,7 +121,13 @@ const UsageDataForm = ({ open, onOpenChange }: UsageDataFormProps) => {
                     <FormItem>
                       <FormLabel>Instagram</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.1" min="0" {...field} />
+                        <Input 
+                          type="number" 
+                          step="0.1" 
+                          min="0" 
+                          {...field}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -97,7 +139,13 @@ const UsageDataForm = ({ open, onOpenChange }: UsageDataFormProps) => {
                     <FormItem>
                       <FormLabel>TikTok</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.1" min="0" {...field} />
+                        <Input 
+                          type="number" 
+                          step="0.1" 
+                          min="0" 
+                          {...field}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -109,7 +157,13 @@ const UsageDataForm = ({ open, onOpenChange }: UsageDataFormProps) => {
                     <FormItem>
                       <FormLabel>Facebook</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.1" min="0" {...field} />
+                        <Input 
+                          type="number" 
+                          step="0.1" 
+                          min="0" 
+                          {...field}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -121,7 +175,13 @@ const UsageDataForm = ({ open, onOpenChange }: UsageDataFormProps) => {
                     <FormItem>
                       <FormLabel>Twitter</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.1" min="0" {...field} />
+                        <Input 
+                          type="number" 
+                          step="0.1" 
+                          min="0" 
+                          {...field}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -135,7 +195,13 @@ const UsageDataForm = ({ open, onOpenChange }: UsageDataFormProps) => {
                   <FormItem>
                     <FormLabel>Academic Usage (%)</FormLabel>
                     <FormControl>
-                      <Input type="number" min="0" max="100" {...field} />
+                      <Input 
+                        type="number" 
+                        min="0" 
+                        max="100" 
+                        {...field}
+                        onChange={(e) => field.onChange(parseFloat(e.target.value))} 
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -148,7 +214,14 @@ const UsageDataForm = ({ open, onOpenChange }: UsageDataFormProps) => {
                   <FormItem>
                     <FormLabel>Current GPA</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.1" min="0" max="5" {...field} />
+                      <Input 
+                        type="number" 
+                        step="0.1" 
+                        min="0" 
+                        max="5" 
+                        {...field}
+                        onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
